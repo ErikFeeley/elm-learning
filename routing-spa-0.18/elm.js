@@ -13720,6 +13720,44 @@ var _evancz$url_parser$UrlParser$intParam = function (name) {
 	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
 };
 
+var _user$project$Page_Counter$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'Increment') {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{counter: model.counter + 1}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{counter: model.counter - 1}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		}
+	});
+var _user$project$Page_Counter$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('hi'),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Page_Counter$Model = function (a) {
+	return {counter: a};
+};
+var _user$project$Page_Counter$init = _user$project$Page_Counter$Model(0);
+var _user$project$Page_Counter$Decrement = {ctor: 'Decrement'};
+var _user$project$Page_Counter$Increment = {ctor: 'Increment'};
+
 var _user$project$Page_Home$view = _elm_lang$html$Html$text('Hello From Home');
 
 var _user$project$Page_NotFound$view = A2(
@@ -13776,31 +13814,14 @@ var _user$project$Main$getPage = function (pageState) {
 		return _p0._0;
 	}
 };
-var _user$project$Main$viewPage = F2(
-	function (isLoading, page) {
-		var _p1 = page;
-		switch (_p1.ctor) {
-			case 'Blank':
-				return _elm_lang$html$Html$text('');
-			case 'Home':
-				return _user$project$Page_Home$view;
-			default:
-				return _user$project$Page_NotFound$view;
-		}
-	});
-var _user$project$Main$view = function (model) {
-	var _p2 = model.pageState;
-	if (_p2.ctor === 'Loaded') {
-		return A2(_user$project$Main$viewPage, false, _p2._0);
-	} else {
-		return A2(_user$project$Main$viewPage, true, _p2._0);
-	}
-};
 var _user$project$Main$Model = function (a) {
 	return {pageState: a};
 };
 var _user$project$Main$NotFound = {ctor: 'NotFound'};
 var _user$project$Main$Home = {ctor: 'Home'};
+var _user$project$Main$Counter = function (a) {
+	return {ctor: 'Counter', _0: a};
+};
 var _user$project$Main$Blank = {ctor: 'Blank'};
 var _user$project$Main$initialPage = _user$project$Main$Blank;
 var _user$project$Main$TransitioningFrom = function (a) {
@@ -13811,8 +13832,8 @@ var _user$project$Main$Loaded = function (a) {
 };
 var _user$project$Main$setRoute = F2(
 	function (maybeRoute, model) {
-		var _p3 = maybeRoute;
-		if (_p3.ctor === 'Nothing') {
+		var _p1 = maybeRoute;
+		if (_p1.ctor === 'Nothing') {
 			return {
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
@@ -13823,7 +13844,7 @@ var _user$project$Main$setRoute = F2(
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
-			if (_p3._0.ctor === 'Home') {
+			if (_p1._0.ctor === 'Home') {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -13850,10 +13871,65 @@ var _user$project$Main$init = function (location) {
 			pageState: _user$project$Main$Loaded(_user$project$Main$initialPage)
 		});
 };
+var _user$project$Main$CounterMsg = function (a) {
+	return {ctor: 'CounterMsg', _0: a};
+};
+var _user$project$Main$viewPage = F2(
+	function (isLoading, page) {
+		var _p2 = page;
+		switch (_p2.ctor) {
+			case 'Blank':
+				return _elm_lang$html$Html$text('');
+			case 'Counter':
+				return A2(
+					_elm_lang$html$Html$map,
+					_user$project$Main$CounterMsg,
+					_user$project$Page_Counter$view(_p2._0));
+			case 'Home':
+				return _user$project$Page_Home$view;
+			default:
+				return _user$project$Page_NotFound$view;
+		}
+	});
+var _user$project$Main$view = function (model) {
+	var _p3 = model.pageState;
+	if (_p3.ctor === 'Loaded') {
+		return A2(_user$project$Main$viewPage, false, _p3._0);
+	} else {
+		return A2(_user$project$Main$viewPage, true, _p3._0);
+	}
+};
 var _user$project$Main$updatePage = F3(
 	function (page, msg, model) {
-		var _p4 = {ctor: '_Tuple2', _0: msg, _1: page};
-		return A2(_user$project$Main$setRoute, _p4._0._0, model);
+		var toPage = F5(
+			function (toModel, toMsg, subUpdate, subMsg, subModel) {
+				var _p4 = A2(subUpdate, subMsg, subModel);
+				var newModel = _p4._0;
+				var newCmd = _p4._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _user$project$Main$Loaded(
+								toModel(newModel))
+						}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, toMsg, newCmd)
+				};
+			});
+		var _p5 = {ctor: '_Tuple2', _0: msg, _1: page};
+		if (_p5._0.ctor === 'SetRoute') {
+			return A2(_user$project$Main$setRoute, _p5._0._0, model);
+		} else {
+			switch (_p5._1.ctor) {
+				case 'Counter':
+					return A5(toPage, _user$project$Main$Counter, _user$project$Main$CounterMsg, _user$project$Page_Counter$update, _p5._0._0, _p5._1._0);
+				case 'NotFound':
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				default:
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			}
+		}
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
@@ -13868,9 +13944,9 @@ var _user$project$Main$SetRoute = function (a) {
 };
 var _user$project$Main$main = A2(
 	_elm_lang$navigation$Navigation$program,
-	function (_p5) {
+	function (_p6) {
 		return _user$project$Main$SetRoute(
-			_user$project$Route$fromLocation(_p5));
+			_user$project$Route$fromLocation(_p6));
 	},
 	{
 		init: _user$project$Main$init,
@@ -13882,7 +13958,7 @@ var _user$project$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"tags":{"SetRoute":["Maybe.Maybe Route.Route"]},"args":[]},"Maybe.Maybe":{"tags":{"Nothing":[],"Just":["a"]},"args":["a"]},"Route.Route":{"tags":{"Home":[],"Root":[]},"args":[]}}},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"tags":{"CounterMsg":["Page.Counter.Msg"],"SetRoute":["Maybe.Maybe Route.Route"]},"args":[]},"Page.Counter.Msg":{"tags":{"Increment":[],"Decrement":[]},"args":[]},"Maybe.Maybe":{"tags":{"Nothing":[],"Just":["a"]},"args":["a"]},"Route.Route":{"tags":{"Home":[],"Root":[]},"args":[]}}},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])
