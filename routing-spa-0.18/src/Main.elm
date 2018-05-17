@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Page.Home as Home
+import Page.NotFound as NotFound
 import Navigation exposing (Location)
 import Html exposing (..)
 import Route exposing (Route)
@@ -9,6 +10,7 @@ import Route exposing (Route)
 type Page
     = Blank
     | Home
+    | NotFound
 
 
 type PageState
@@ -58,6 +60,9 @@ viewPage isLoading page =
         Home ->
             Home.view
 
+        NotFound ->
+            NotFound.view
+
 
 
 -- UPDATE --
@@ -71,7 +76,7 @@ setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
 setRoute maybeRoute model =
     case maybeRoute of
         Nothing ->
-            ( { model | pageState = Loaded Home }, Cmd.none )
+            ( { model | pageState = Loaded NotFound }, Cmd.none )
 
         Just Route.Home ->
             ( { model | pageState = Loaded Home }, Cmd.none )

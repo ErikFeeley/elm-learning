@@ -13722,6 +13722,15 @@ var _evancz$url_parser$UrlParser$intParam = function (name) {
 
 var _user$project$Page_Home$view = _elm_lang$html$Html$text('Hello From Home');
 
+var _user$project$Page_NotFound$view = A2(
+	_elm_lang$html$Html$div,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('not found bro'),
+		_1: {ctor: '[]'}
+	});
+
 var _user$project$Route$routeToString = function (page) {
 	var pieces = function () {
 		var _p0 = page;
@@ -13770,10 +13779,13 @@ var _user$project$Main$getPage = function (pageState) {
 var _user$project$Main$viewPage = F2(
 	function (isLoading, page) {
 		var _p1 = page;
-		if (_p1.ctor === 'Blank') {
-			return _elm_lang$html$Html$text('');
-		} else {
-			return _user$project$Page_Home$view;
+		switch (_p1.ctor) {
+			case 'Blank':
+				return _elm_lang$html$Html$text('');
+			case 'Home':
+				return _user$project$Page_Home$view;
+			default:
+				return _user$project$Page_NotFound$view;
 		}
 	});
 var _user$project$Main$view = function (model) {
@@ -13787,6 +13799,7 @@ var _user$project$Main$view = function (model) {
 var _user$project$Main$Model = function (a) {
 	return {pageState: a};
 };
+var _user$project$Main$NotFound = {ctor: 'NotFound'};
 var _user$project$Main$Home = {ctor: 'Home'};
 var _user$project$Main$Blank = {ctor: 'Blank'};
 var _user$project$Main$initialPage = _user$project$Main$Blank;
@@ -13805,7 +13818,7 @@ var _user$project$Main$setRoute = F2(
 				_0: _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						pageState: _user$project$Main$Loaded(_user$project$Main$Home)
+						pageState: _user$project$Main$Loaded(_user$project$Main$NotFound)
 					}),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
