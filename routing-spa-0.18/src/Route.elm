@@ -16,6 +16,7 @@ import UrlParser exposing (Parser, oneOf, parseHash, s)
 type Route
     = Home
     | Root
+    | Counter
 
 
 
@@ -30,6 +31,7 @@ route : Parser (Route -> a) a
 route =
     oneOf
         [ UrlParser.map Home (s "")
+        , UrlParser.map Counter (s "counter")
         ]
 
 
@@ -51,6 +53,9 @@ routeToString page =
 
                 Root ->
                     []
+
+                Counter ->
+                    [ "counter" ]
     in
         "#/" ++ String.join "/" pieces
 

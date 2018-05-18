@@ -84,6 +84,9 @@ view model =
    isloading bits
 
    da heck is going on with subModel...
+   i think the subModel gets piped through
+   html map to themsg type target? something like
+   that... hmmmm.
 -}
 
 
@@ -137,6 +140,9 @@ setRoute maybeRoute model =
 
         Just Route.Root ->
             ( model, Route.modifyUrl Route.Home )
+
+        Just Route.Counter ->
+            ( { model | pageState = Loaded (Counter Counter.init) }, Cmd.none )
 
 
 
