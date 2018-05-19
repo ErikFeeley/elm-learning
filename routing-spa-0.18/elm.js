@@ -14178,7 +14178,7 @@ var _user$project$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"tags":{"CounterMsg":["Page.Counter.Msg"],"SetRoute":["Maybe.Maybe Route.Route"]},"args":[]},"Page.Counter.Msg":{"tags":{"Increment":[],"Decrement":[]},"args":[]},"Maybe.Maybe":{"tags":{"Nothing":[],"Just":["a"]},"args":["a"]},"Route.Route":{"tags":{"Counter":[],"Home":[],"Root":[]},"args":[]}}},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Route.Route":{"args":[],"tags":{"Home":[],"Root":[],"Counter":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Counter.Msg":{"args":[],"tags":{"Decrement":[],"Increment":[]}},"Main.Msg":{"args":[],"tags":{"SetRoute":["Maybe.Maybe Route.Route"],"CounterMsg":["Page.Counter.Msg"]}}},"aliases":{},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])
