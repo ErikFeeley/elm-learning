@@ -19,9 +19,10 @@ the spa example for styling the active link
 
 -}
 type ActivePage
-    = Other
+    = Counter
+    | Form
     | Home
-    | Counter
+    | Other
 
 
 
@@ -54,4 +55,5 @@ viewNavbar =
         [ text "this is actually a navbar yo"
         , span [] [ a [ Route.href Route.Home ] [ text "home" ] ]
         , span [] [ a [ Route.href Route.Counter ] [ text "counter" ] ]
+        , span [] [ a [ Route.href Route.Form ] [ text "form" ] ]
         ]

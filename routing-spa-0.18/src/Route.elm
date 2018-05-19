@@ -1,22 +1,23 @@
 module Route exposing (Route(..), fromLocation, href, modifyUrl)
 
 import Html exposing (Attribute)
-import Navigation exposing (Location)
 import Html.Attributes as Attr
+import Navigation exposing (Location)
 import UrlParser exposing (Parser, oneOf, parseHash, s)
 
 
 -- ROUTING --
 {-
-   i think these are going to match up literally with
+   i think these are going to match up  with
    all of the possible page routes
 -}
 
 
 type Route
-    = Home
+    = Counter
+    | Form
+    | Home
     | Root
-    | Counter
 
 
 
@@ -32,6 +33,7 @@ route =
     oneOf
         [ UrlParser.map Home (s "")
         , UrlParser.map Counter (s "counter")
+        , UrlParser.map Form (s "form")
         ]
 
 
@@ -48,22 +50,32 @@ routeToString page =
     let
         pieces =
             case page of
+                Counter ->
+                    [ "counter" ]
+
+                Form ->
+                    [ "form" ]
+
                 Home ->
                     []
 
                 Root ->
                     []
-
-                Counter ->
-                    [ "counter" ]
     in
-        "#/" ++ String.join "/" pieces
+    "#/" ++ String.join "/" pieces
 
 
 
 -- PUBLIC HELPERS --
 {-
    not super clear on the usage of the following yet
+
+   ok got kinda got it now so href is literally
+   a helper for setting href attribute for a link
+   modifyUrl is for changing the url for whatever reason
+   like in Main right now if i see root i change it to home
+
+   i think im using fromlocation yet
 -}
 
 

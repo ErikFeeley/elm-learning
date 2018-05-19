@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Navigation exposing (Location)
 import Page.Counter as Counter
+import Page.Form as Form
 import Page.Home as Home
 import Page.NotFound as NotFound
 import Route exposing (Route)
@@ -10,13 +11,15 @@ import Views.Page as Page exposing (ActivePage, frame)
 
 
 {-
-   literally a page type that describes every page in our SPA
+   a page type that describes every page in our SPA
+   importantly includes the pages model if it has one
 -}
 
 
 type Page
     = Blank
     | Counter Counter.Model
+    | Form Form.Model
     | Home
     | NotFound
 
@@ -103,6 +106,11 @@ viewPage isLoading page =
                 |> frame
                 |> Html.map CounterMsg
 
+        Form subModel ->
+            Form.view subModel
+                |> frame
+                |> Html.map FormMsg
+
         Home ->
             Home.view
                 |> frame
@@ -126,6 +134,7 @@ viewPage isLoading page =
 type Msg
     = SetRoute (Maybe Route)
     | CounterMsg Counter.Msg
+    | FormMsg Form.Msg
 
 
 
@@ -140,14 +149,17 @@ setRoute maybeRoute model =
         Nothing ->
             ( { model | pageState = Loaded NotFound }, Cmd.none )
 
+        Just Route.Counter ->
+            ( { model | pageState = Loaded (Counter Counter.init) }, Cmd.none )
+
+        Just Route.Form ->
+            ( { model | pageState = Loaded (Form Form.init) }, Cmd.none )
+
         Just Route.Home ->
             ( { model | pageState = Loaded Home }, Cmd.none )
 
         Just Route.Root ->
             ( model, Route.modifyUrl Route.Home )
-
-        Just Route.Counter ->
-            ( { model | pageState = Loaded (Counter Counter.init) }, Cmd.none )
 
 
 
@@ -207,6 +219,18 @@ getPage pageState =
     something is wrong it wont go to teh counter page..
     i think i need to add something in the Route.elm
     it keeps going to not found.
+
+    wrapping back to this the following pattern is actually
+    not needed right now
+    ( _, NotFound ) ->
+            ( model, Cmd.none )
+
+
+    ohhhhhhhh tricky tricky
+    ok so here is why my form was not updating when i added the form route
+    in order to satisfy the cases i had to add the final catch all guy
+    but because i did that the cases did not update when i added another
+    union to page therefore the model was never updating there
 -}
 
 
@@ -227,8 +251,8 @@ updatePage page msg model =
         ( CounterMsg subMsg, Counter subModel ) ->
             toPage Counter CounterMsg Counter.update subMsg subModel
 
-        ( _, NotFound ) ->
-            ( model, Cmd.none )
+        ( FormMsg subMsg, Form subModel ) ->
+            toPage Form FormMsg Form.update subMsg subModel
 
         ( _, _ ) ->
             ( model, Cmd.none )
