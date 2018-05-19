@@ -52,4 +52,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetInput str ->
-            ( { model | input = str, reversed = String.reverse str }, Cmd.none )
+            { model | input = str, reversed = String.reverse str }
+                |> withoutCmd
+
+
+
+{-
+   eh kinda fun i guess
+   so instead of doing
+
+   ( { model | input = str, reversed = String.reverse str }, Cmd.none )
+   you can do
+   { model | input = str, reversed = String.reverse str }
+        |> withoutCmd
+-}
+
+
+withoutCmd : Model -> ( Model, Cmd Msg )
+withoutCmd model =
+    ( model, Cmd.none )
