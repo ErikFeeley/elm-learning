@@ -1,11 +1,12 @@
 module Main exposing (..)
 
+import Html exposing (..)
+import Navigation exposing (Location)
 import Page.Counter as Counter
 import Page.Home as Home
 import Page.NotFound as NotFound
-import Navigation exposing (Location)
-import Html exposing (..)
 import Route exposing (Route)
+import Views.Page as Page exposing (ActivePage, frame)
 
 
 {-
@@ -95,16 +96,20 @@ viewPage isLoading page =
     case page of
         Blank ->
             Html.text ""
+                |> frame
 
         Counter subModel ->
             Counter.view subModel
+                |> frame
                 |> Html.map CounterMsg
 
         Home ->
             Home.view
+                |> frame
 
         NotFound ->
             NotFound.view
+                |> frame
 
 
 
@@ -213,20 +218,20 @@ updatePage page msg model =
                 ( newModel, newCmd ) =
                     subUpdate subMsg subModel
             in
-                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
+            ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
     in
-        case ( msg, page ) of
-            ( SetRoute route, _ ) ->
-                setRoute route model
+    case ( msg, page ) of
+        ( SetRoute route, _ ) ->
+            setRoute route model
 
-            ( CounterMsg subMsg, Counter subModel ) ->
-                toPage Counter CounterMsg Counter.update subMsg subModel
+        ( CounterMsg subMsg, Counter subModel ) ->
+            toPage Counter CounterMsg Counter.update subMsg subModel
 
-            ( _, NotFound ) ->
-                ( model, Cmd.none )
+        ( _, NotFound ) ->
+            ( model, Cmd.none )
 
-            ( _, _ ) ->
-                ( model, Cmd.none )
+        ( _, _ ) ->
+            ( model, Cmd.none )
 
 
 main : Program Never Model Msg
