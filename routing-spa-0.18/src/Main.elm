@@ -63,8 +63,7 @@ initialPage =
 
 -- VIEW --
 {-
-   ok not using it just yet but this top level
-   view function is about taking our pageState
+   this top level view function is about taking our pageState
    and then passing on a Bool for isLoading
    to the viewPage function
 -}
@@ -91,6 +90,16 @@ view model =
    i think the subModel gets piped through
    html map to themsg type target? something like
    that... hmmmm.
+
+   ok i think i get it... somehow the page
+   is coming through the elm runtime with the subModel?
+   ... so when we are pattern matching here on page
+   the subModel is not coming out of thin air we are simply
+   extracting that value as part of the match
+   then we pass that model to the pages view that we want to view
+   ... or something along those lines...
+
+   using html.map to get the types to fit
 -}
 
 
@@ -124,10 +133,10 @@ viewPage isLoading page =
 -- UPDATE --
 {-
    in richards example this gets a lot bigger.
-   for now im just worried about setting the route
-   later on i can use this for other messages which
-   could be Results are just regular messages from
-   looking at the example
+   for now just have a Msg for setting the route,
+   and then msgs that represent the pages messages
+   i think this can also be expanded for things like
+   results for http requests
 -}
 
 
