@@ -3,7 +3,7 @@ module Route exposing (Route(..), fromLocation, href, modifyUrl)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Navigation exposing (Location)
-import UrlParser exposing (Parser, oneOf, parseHash, s)
+import UrlParser exposing (Parser, map, oneOf, parseHash, s)
 
 
 -- ROUTING --
@@ -31,9 +31,9 @@ type Route
 route : Parser (Route -> a) a
 route =
     oneOf
-        [ UrlParser.map Home (s "")
-        , UrlParser.map Counter (s "counter")
-        , UrlParser.map Form (s "form")
+        [ map Home (s "")
+        , map Counter (s "counter")
+        , map Form (s "form")
         ]
 
 
