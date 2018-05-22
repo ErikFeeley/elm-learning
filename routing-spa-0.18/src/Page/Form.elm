@@ -1,7 +1,8 @@
 module Page.Form exposing (..)
 
-import Html exposing (Html, div, input, text)
-import Html.Events exposing (onInput)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import String
 
 
@@ -9,14 +10,12 @@ import String
 
 
 type alias Model =
-    { input : String
-    , reversed : String
-    }
+    { input : String }
 
 
 init : Model
 init =
-    Model "" ""
+    Model ""
 
 
 
@@ -27,15 +26,16 @@ view : Model -> Html Msg
 view model =
     div []
         [ div []
-            [ input [ onInput SetInput ] []
+            [ input [ onInput SetStr, value model.input ] []
             , div []
                 [ text "echo: "
                 , text model.input
                 ]
             , div []
                 [ text "reversed: "
-                , text model.reversed
+                , text (String.reverse model.input)
                 ]
+            , div [] [ button [ onClick Reset ] [ text "Reset" ] ]
             ]
         ]
 
@@ -45,15 +45,19 @@ view model =
 
 
 type Msg
-    = SetInput String
+    = SetStr String
+    | Reset
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SetInput str ->
-            { model | input = str, reversed = String.reverse str }
+        SetStr str ->
+            { model | input = str }
                 |> withoutCmd
+
+        Reset ->
+            ( { model | input = "" }, Cmd.none )
 
 
 
