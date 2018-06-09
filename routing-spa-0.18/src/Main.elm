@@ -260,10 +260,13 @@ updatePage page msg model =
         ( CounterMsg subMsg, Counter subModel ) ->
             toPage Counter CounterMsg Counter.update subMsg subModel
 
+        ( CounterMsg subMsg, _ ) ->
+            ( model, Cmd.none )
+
         ( FormMsg subMsg, Form subModel ) ->
             toPage Form FormMsg Form.update subMsg subModel
 
-        ( _, _ ) ->
+        ( FormMsg subMsg, _ ) ->
             ( model, Cmd.none )
 
 
