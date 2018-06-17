@@ -41,10 +41,21 @@ view model =
 
 viewMatches : List Match -> Html msg
 viewMatches matches =
-    div [] (List.map viewMatch matches)
+    div [ class "card-deck" ] <| List.map viewMatch matches
 
 
 viewMatch : Match -> Html msg
 viewMatch match =
-    div [ class "card" ]
-        [ h5 [ class "card-header" ] [ text "wat" ] ]
+    div [ class "card shadow-sm" ]
+        [ div [ class "card-header" ]
+            [ text <| "Venue: " ++ match.venue ]
+        , div
+            [ class "card-body" ]
+            [ h6 [ class "card-subtitle text-muted" ] [ text <| "Location: " ++ match.location ]
+            , p [ class "card-text" ] [ text <| "When: " ++ match.status ]
+            , p [ class "card-text" ] [ text <| "Time: " ++ match.datetime ]
+            , p [ class "card-text" ] [ text <| "Home Team: " ++ match.homeTeam.code ]
+            , p [ class "card-text" ] [ text <| "Away Team: " ++ match.awayTeam.code ]
+            , p [ class "card-text" ] [ text <| "Winner (if there is yet): " ++ match.winner ]
+            ]
+        ]

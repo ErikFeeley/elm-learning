@@ -75,6 +75,31 @@ viewPage isLoading page =
 
 
 
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch [ pageSubscriptions (getPage model.pageState) ]
+
+
+pageSubscriptions : Page -> Sub Msg
+pageSubscriptions page =
+    case page of
+        Blank ->
+            Sub.none
+
+        NotFound ->
+            Sub.none
+
+        Errored _ ->
+            Sub.none
+
+        Home _ ->
+            Sub.none
+
+
+
 -- UPDATE
 
 
@@ -87,7 +112,9 @@ setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
 setRoute maybeRoute model =
     let
         transition toMsg task =
-            ( { model | pageState = TransitioningFrom (getPage model.pageState) }, Task.attempt toMsg task )
+            ( { model | pageState = TransitioningFrom (getPage model.pageState) }
+            , Task.attempt toMsg task
+            )
     in
     case maybeRoute of
         Nothing ->
