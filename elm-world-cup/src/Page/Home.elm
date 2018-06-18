@@ -18,7 +18,7 @@ init : Task PageLoadError Model
 init =
     let
         loadMatches =
-            Request.Match.list
+            Request.Match.todaysMatches
                 |> Http.toTask
 
         handleLoadError _ =

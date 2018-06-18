@@ -6,6 +6,6 @@ import Json.Decode as Decode
 import Request.Helpers exposing (apiUrl)
 
 
-list : Http.Request (List Match)
-list =
+todaysMatches : Http.Request (List Match)
+todaysMatches =
     Http.get (apiUrl "/matches/today") (Decode.list decodeMatch)
