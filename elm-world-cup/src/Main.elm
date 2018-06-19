@@ -59,19 +59,19 @@ viewPage isLoading page =
     case page of
         Blank ->
             Html.text ""
-                |> frame Page.Other
+                |> frame Page.Other isLoading
 
         NotFound ->
             NotFound.view
-                |> frame Page.Other
+                |> frame Page.Other isLoading
 
         Errored subModel ->
             Errored.view subModel
-                |> frame Page.Other
+                |> frame Page.Other isLoading
 
         Home subModel ->
             Home.view subModel
-                |> frame Page.Home
+                |> frame Page.Home isLoading
 
 
 

@@ -6,6 +6,7 @@ module Views.Page exposing (ActivePage(..), frame)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Route exposing (Route)
+import Views.Spinner exposing (spinner)
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -40,16 +41,16 @@ type ActivePage
 -}
 
 
-frame : ActivePage -> Html msg -> Html msg
-frame page content =
+frame : ActivePage -> Bool -> Html msg -> Html msg
+frame page isLoading content =
     div []
-        [ viewNavbar page
+        [ viewNavbar page isLoading
         , content
         ]
 
 
-viewNavbar : ActivePage -> Html msg
-viewNavbar page =
+viewNavbar : ActivePage -> Bool -> Html msg
+viewNavbar page isLoading =
     let
         linkTo =
             navBarLink page
@@ -58,6 +59,7 @@ viewNavbar page =
         [ a [ class "navbar-brand", Route.href Route.Home ]
             [ text "Elm World Cup" ]
         , linkTo Route.Home [ text "Todays Matches" ]
+        , span [ class "navbar-text" ] [ loader isLoading ]
         ]
 
 
@@ -82,3 +84,11 @@ isActive page route =
 
         _ ->
             False
+
+
+loader : Bool -> Html msg
+loader isLoading =
+    if isLoading then
+        spinner
+    else
+        text ""
