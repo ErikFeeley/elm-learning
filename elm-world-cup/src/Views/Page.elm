@@ -22,6 +22,7 @@ the spa example for styling the active link
 -}
 type ActivePage
     = Home
+    | TeamResult
     | Other
 
 
@@ -59,6 +60,7 @@ viewNavbar page isLoading =
         [ a [ class "navbar-brand", Route.href Route.Home ]
             [ text "Elm World Cup" ]
         , linkTo Route.Home [ text "Todays Matches" ]
+        , linkTo Route.TeamResult [ text "Team Results" ]
         , span [ class "navbar-text ml-auto" ] [ loader isLoading ]
         ]
 
@@ -80,6 +82,9 @@ isActive : ActivePage -> Route -> Bool
 isActive page route =
     case ( page, route ) of
         ( Home, Route.Home ) ->
+            True
+
+        ( TeamResult, Route.TeamResult ) ->
             True
 
         _ ->

@@ -1,4 +1,4 @@
-module Page.Home exposing (..)
+module Page.Home exposing (Model, init, view)
 
 import Data.Match exposing (Match)
 import Html exposing (..)

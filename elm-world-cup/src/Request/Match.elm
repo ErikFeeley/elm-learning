@@ -1,4 +1,4 @@
-module Request.Match exposing (..)
+module Request.Match exposing (todaysMatches)
 
 import Data.Match as Match exposing (Match, decodeMatch)
 import Http

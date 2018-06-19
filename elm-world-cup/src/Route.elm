@@ -8,13 +8,16 @@ import UrlParser exposing (Parser, map, oneOf, parseHash, s)
 
 type Route
     = Home
+    | TeamResult
     | Root
 
 
 route : Parser (Route -> a) a
 route =
     oneOf
-        [ map Home (s "") ]
+        [ map Home (s "")
+        , map TeamResult (s "results")
+        ]
 
 
 routeToString : Route -> String
@@ -27,6 +30,9 @@ routeToString page =
 
                 Root ->
                     []
+
+                TeamResult ->
+                    [ "results" ]
     in
     "#/" ++ String.join "/" pieces
 

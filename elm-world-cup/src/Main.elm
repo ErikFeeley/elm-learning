@@ -5,6 +5,7 @@ import Navigation exposing (Location)
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.NotFound as NotFound
+import Page.TeamResult as TeamResult
 import Route exposing (Route)
 import Task
 import Views.Page as Page exposing (ActivePage, frame)
@@ -18,6 +19,7 @@ type Page
     | NotFound
     | Errored PageLoadError
     | Home Home.Model
+    | TeamResult TeamResult.Model
 
 
 type PageState
@@ -73,6 +75,11 @@ viewPage isLoading page =
             Home.view subModel
                 |> frame Page.Home isLoading
 
+        TeamResult subModel ->
+            TeamResult.view subModel
+                |> frame Page.TeamResult isLoading
+                |> Html.map TeamMsg
+
 
 
 -- SUBSCRIPTIONS
@@ -98,6 +105,9 @@ pageSubscriptions page =
         Home _ ->
             Sub.none
 
+        TeamResult _ ->
+            Sub.none
+
 
 
 -- UPDATE
@@ -106,6 +116,8 @@ pageSubscriptions page =
 type Msg
     = SetRoute (Maybe Route)
     | HomeLoaded (Result PageLoadError Home.Model)
+    | TeamResultLoaded (Result PageLoadError TeamResult.Model)
+    | TeamMsg TeamResult.Msg
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -125,6 +137,9 @@ setRoute maybeRoute model =
 
         Just Route.Root ->
             ( model, Route.modifyUrl Route.Home )
+
+        Just Route.TeamResult ->
+            transition TeamResultLoaded TeamResult.init
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -161,6 +176,18 @@ updatePage page msg model =
 
         ( HomeLoaded (Err error), _ ) ->
             ( { model | pageState = Loaded (Errored error) }, Cmd.none )
+
+        ( TeamResultLoaded (Ok subModel), _ ) ->
+            ( { model | pageState = Loaded (TeamResult subModel) }, Cmd.none )
+
+        ( TeamResultLoaded (Err error), _ ) ->
+            ( { model | pageState = Loaded (Errored error) }, Cmd.none )
+
+        ( TeamMsg subMsg, TeamResult subModel ) ->
+            toPage TeamResult TeamMsg TeamResult.update subMsg subModel
+
+        ( TeamMsg subMsg, _ ) ->
+            ( model, Cmd.none )
 
 
 main : Program Never Model Msg
