@@ -59,7 +59,7 @@ viewNavbar page isLoading =
         [ a [ class "navbar-brand", Route.href Route.Home ]
             [ text "Elm World Cup" ]
         , linkTo Route.Home [ text "Todays Matches" ]
-        , span [ class "navbar-text" ] [ loader isLoading ]
+        , span [ class "navbar-text ml-auto" ] [ loader isLoading ]
         ]
 
 
