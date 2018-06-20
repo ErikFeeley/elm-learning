@@ -1,8 +1,9 @@
 module Page.NotFound exposing (view)
 
 import Html exposing (Html, div, text)
+import Html.Attributes exposing (..)
 
 
 view : Html msg
 view =
-    div [] [ text "not found bro" ]
+    div [ class "container" ] [ text "not found bro" ]

@@ -2,6 +2,8 @@ module Page.TeamResult exposing (Model, Msg, init, update, view)
 
 import Data.TeamResult as TeamResult exposing (TeamResult)
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.TeamResult exposing (getTeamResults)
@@ -14,6 +16,8 @@ import Views.Page as Page
 
 type alias Model =
     { searchInput : String
+    , searchResults : List TeamResult
+    , selectedTeam : Maybe TeamResult
     , teamResults : List TeamResult
     }
 
@@ -28,7 +32,7 @@ init =
         handleLoadError _ =
             pageLoadError Page.TeamResult "Team results failed to load"
     in
-    Task.map (Model "") loadTeamResults
+    Task.map (Model "" [] Nothing) loadTeamResults
         |> Task.mapError handleLoadError
 
 
@@ -36,9 +40,66 @@ init =
 -- VIEW
 
 
+viewSearchArea : Html Msg
+viewSearchArea =
+    div [ class "columns" ]
+        [ div [ class "column" ]
+            [ div [ class "field" ]
+                [ label [ class "label" ]
+                    [ text "Search For A Team" ]
+                , div [ class "control" ]
+                    [ input
+                        [ class "input"
+                        , onInput SetSearch
+                        , placeholder "Text input"
+                        , type_ "text"
+                        ]
+                        []
+                    ]
+                , p [ class "help" ]
+                    [ text "Search by country or FIFA code" ]
+                ]
+            ]
+        ]
+
+
+viewResults : List TeamResult -> List (Html Msg)
+viewResults searchResults =
+    searchResults
+        |> List.map (\r -> a [ class "panel-block", onClick (SetSelectedTeam r.id) ] [ text r.country ])
+
+
+viewSearchResults : List TeamResult -> Html Msg
+viewSearchResults searchResults =
+    div [ class "columns" ]
+        [ div [ class "column" ]
+            [ div [ class "panel" ]
+                [ p [ class "panel-heading" ] [ text "Found Teams" ]
+                , div [] (viewResults searchResults)
+                ]
+            ]
+        ]
+
+
+viewSelectedTeam : Maybe TeamResult -> Html Msg
+viewSelectedTeam team =
+    case team of
+        Nothing ->
+            span [] [ text "" ]
+
+        Just team ->
+            div [] [ text team.country ]
+
+
 view : Model -> Html Msg
 view model =
-    text "team results page"
+    section [ class "section" ]
+        [ div [ class "container" ]
+            [ viewSearchArea
+            , viewSearchResults model.searchResults
+            , viewSelectedTeam model.selectedTeam
+            ]
+        ]
 
 
 
@@ -47,8 +108,25 @@ view model =
 
 type Msg
     = SetSearch String
+    | SetSelectedTeam Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        SetSearch search ->
+            ( { model
+                | searchInput = search
+                , searchResults =
+                    List.filter
+                        (\r ->
+                            String.contains (String.toLower search) (String.toLower r.fifaCode)
+                                || String.contains (String.toLower search) (String.toLower r.country)
+                        )
+                        model.teamResults
+              }
+            , Cmd.none
+            )
+
+        SetSelectedTeam id ->
+            ( model, Cmd.none )

@@ -30,34 +30,35 @@ init =
 
 view : Model -> Html msg
 view model =
-    div [ class "container" ]
-        [ div [ class "row" ]
-            [ h1 [ class "display-4" ] [ text "Todays Matches" ] ]
-        , div [ class "row" ]
-            [ div [ class "col" ] [ viewMatches model.matches ]
+    section [ class "section" ]
+        [ div [ class "container" ]
+            [ viewMatches model.matches
             ]
         ]
 
 
 viewMatches : List Match -> Html msg
 viewMatches matches =
-    div [ class "card-deck" ] <| List.map viewMatch matches
+    div [ class "columns is-multiline" ] <| List.map viewMatch matches
 
 
 viewMatch : Match -> Html msg
 viewMatch match =
-    div [ class "card shadow-sm" ]
-        [ div [ class "card-header" ]
-            [ text <| "Venue: " ++ match.venue ]
-        , div
-            [ class "card-body" ]
-            [ h6 [ class "card-subtitle text-muted" ] [ text <| "Location: " ++ match.location ]
-            , p [ class "card-text" ] [ text <| "When: " ++ match.status ]
-            , p [ class "card-text" ] [ text <| "Time: " ++ match.datetime ]
-            , p [ class "card-text" ] [ text <| "Home Team: " ++ match.homeTeam.code ]
-            , p [ class "card-text" ] [ text <| "Home Team Goals: " ++ toString match.homeTeam.goals ]
-            , p [ class "card-text" ] [ text <| "Away Team: " ++ match.awayTeam.code ]
-            , p [ class "card-text" ] [ text <| "Away Team Goals: " ++ toString match.awayTeam.goals ]
-            , p [ class "card-text" ] [ text <| "Winner (if there is yet): " ++ match.winner ]
+    div [ class "column is-half" ]
+        [ div [ class "card" ]
+            [ div [ class "card-content" ]
+                [ div
+                    [ class "content" ]
+                    [ p [ class "title" ] [ text <| "Venue: " ++ match.venue ]
+                    , p [ class "subtitle" ] [ text <| "Location: " ++ match.location ]
+                    , p [] [ text <| "When: " ++ match.status ]
+                    , p [] [ text <| "Time: " ++ match.datetime ]
+                    , p [] [ text <| "Home Team: " ++ match.homeTeam.code ]
+                    , p [] [ text <| "Home Team Goals: " ++ toString match.homeTeam.goals ]
+                    , p [] [ text <| "Away Team: " ++ match.awayTeam.code ]
+                    , p [] [ text <| "Away Team Goals: " ++ toString match.awayTeam.goals ]
+                    , p [] [ text <| "Winner (if there is yet): " ++ match.winner ]
+                    ]
+                ]
             ]
         ]

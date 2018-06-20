@@ -56,12 +56,27 @@ viewNavbar page isLoading =
         linkTo =
             navBarLink page
     in
-    nav [ class "nav navbar-light bg-light" ]
-        [ a [ class "navbar-brand", Route.href Route.Home ]
-            [ text "Elm World Cup" ]
-        , linkTo Route.Home [ text "Todays Matches" ]
-        , linkTo Route.TeamResult [ text "Team Results" ]
-        , span [ class "navbar-text ml-auto" ] [ loader isLoading ]
+    nav [ class "navbar is-primary" ]
+        [ div [ class "navbar-brand", Route.href Route.Home ]
+            [ a [ class "navbar-item" ] [ text "Elm World Cup" ]
+            , a [ attribute "aria-expanded" "false", attribute "aria-label" "menu", class "navbar-burger", attribute "role" "button" ]
+                [ span [ attribute "aria-hidden" "true" ]
+                    []
+                , span [ attribute "aria-hidden" "true" ]
+                    []
+                , span [ attribute "aria-hidden" "true" ]
+                    []
+                ]
+            ]
+        , div [ class "navbar-menu" ]
+            [ div [ class "navbar-start" ]
+                [ linkTo Route.Home [ text "Todays Matches" ]
+                , linkTo Route.TeamResult [ text "Team Results" ]
+                ]
+            , div [ class "navbar-end" ]
+                [ span [ class "navbar-item" ] [ loader isLoading ]
+                ]
+            ]
         ]
 
 
@@ -69,9 +84,8 @@ navBarLink : ActivePage -> Route -> List (Html msg) -> Html msg
 navBarLink page route linkContent =
     a
         [ classList
-            [ ( "nav-item", True )
-            , ( "nav-link", True )
-            , ( "active", isActive page route )
+            [ ( "navbar-item", True )
+            , ( "is-active", isActive page route )
             ]
         , Route.href route
         ]
