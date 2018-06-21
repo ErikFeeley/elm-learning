@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
+import List.Extra
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.TeamResult exposing (getTeamResults)
 import Task exposing (Task)
@@ -71,14 +72,19 @@ viewResults searchResults =
 
 viewSearchResults : List TeamResult -> Html Msg
 viewSearchResults searchResults =
-    div [ class "columns" ]
-        [ div [ class "column" ]
-            [ div [ class "panel" ]
-                [ p [ class "panel-heading" ] [ text "Found Teams" ]
-                , div [] (viewResults searchResults)
+    case searchResults of
+        [] ->
+            text ""
+
+        x :: _ ->
+            div [ class "columns" ]
+                [ div [ class "column" ]
+                    [ div [ class "panel" ]
+                        [ p [ class "panel-heading" ] [ text "Found Teams" ]
+                        , div [] (viewResults searchResults)
+                        ]
+                    ]
                 ]
-            ]
-        ]
 
 
 viewSelectedTeam : Maybe TeamResult -> Html Msg
@@ -129,4 +135,8 @@ update msg model =
             )
 
         SetSelectedTeam id ->
-            ( model, Cmd.none )
+            let
+                selectedTeam =
+                    List.Extra.find (\e -> e.id == id) model.searchResults
+            in
+            ( { model | selectedTeam = selectedTeam }, Cmd.none )
