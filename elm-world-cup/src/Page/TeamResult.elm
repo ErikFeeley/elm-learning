@@ -94,7 +94,18 @@ viewSelectedTeam team =
             span [] [ text "" ]
 
         Just team ->
-            div [] [ text team.country ]
+            div [ class "card" ]
+                [ div [ class "card-content" ]
+                    [ p [ class "title" ] [ text <| "Country: " ++ team.country ]
+                    , p [ class "subtitle" ] [ text <| "FIFA Code: " ++ team.fifaCode ]
+                    , p [] [ text <| "Games Played: " ++ toString team.gamesPlayed ]
+                    , p [] [ text <| "Wins: " ++ toString team.wins ]
+                    , p [] [ text <| "Losses: " ++ toString team.losses ]
+                    , p [] [ text <| "Goals For: " ++ toString team.goalsFor ]
+                    , p [] [ text <| "Goals Agains: " ++ toString team.goalsAgainst ]
+                    , p [] [ text <| "Goal Differential: " ++ toString team.goalDifferential ]
+                    ]
+                ]
 
 
 view : Model -> Html Msg
