@@ -4,6 +4,7 @@ import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation as Nav exposing (Key)
 import Element
 import Html exposing (Html)
+import Layout
 import Page.Counter as Counter
 import Page.NotFound as NotFound
 import Page.StringReverser as StringReverser
@@ -56,19 +57,13 @@ view : Model -> Document Msg
 view model =
     case model.page of
         NotFound ->
-            { title = "Not Found"
-            , body = [ Element.layout [] <| NotFound.view ]
-            }
+            Layout.view never NotFound.view
 
         Counter subModel ->
-            { title = "Counter"
-            , body = [ Html.map CounterMsg <| Element.layout [] <| Counter.view subModel ]
-            }
+            Layout.view CounterMsg (Counter.view subModel)
 
         StringReverser subModel ->
-            { title = "StringReverser"
-            , body = [ Html.map StringReverserMsg <| Element.layout [] <| StringReverser.view subModel ]
-            }
+            Layout.view StringReverserMsg (StringReverser.view subModel)
 
 
 
