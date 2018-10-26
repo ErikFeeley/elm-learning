@@ -39,7 +39,6 @@ view model =
                 , placeholder = Nothing
                 , label = Input.labelLeft [] <| text "label"
                 }
-            , Element.link [] { url = "/", label = text "counter" }
             ]
         ]
 

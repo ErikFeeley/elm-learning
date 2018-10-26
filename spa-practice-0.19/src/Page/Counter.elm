@@ -31,7 +31,6 @@ view model =
             , Input.button [] { onPress = Just Increment, label = text "Increment" }
             , Input.button [] { onPress = Just Decrement, label = text "Decrement" }
             , Input.button [] { onPress = Just Reset, label = text "Reset" }
-            , Element.link [] { url = "/stringreverser", label = text "String Reverser" }
             ]
         ]
 

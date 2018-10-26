@@ -1,8 +1,8 @@
 module Layout exposing (view)
 
 import Browser exposing (Document)
-import Element exposing (Element)
-import Html exposing (Html, text)
+import Element exposing (Element, column, el, row, text)
+import Html
 
 
 
@@ -12,5 +12,20 @@ import Html exposing (Html, text)
 view : (a -> msg) -> Element a -> Document msg
 view toMsg element =
     { title = "Courses"
-    , body = [ Html.map toMsg <| Element.layout [] element ]
+    , body =
+        [ Html.map toMsg <|
+            Element.layout [] <|
+                column []
+                    [ viewNav
+                    , element
+                    ]
+        ]
     }
+
+
+viewNav : Element msg
+viewNav =
+    row [ Element.padding 2, Element.spacing 4 ]
+        [ Element.link [] { url = "/", label = text "counter" }
+        , Element.link [] { url = "/stringreverser", label = text "String Reverser" }
+        ]
