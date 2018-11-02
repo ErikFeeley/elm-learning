@@ -28,4 +28,5 @@ viewNav =
     row [ Element.padding 2, Element.spacing 4 ]
         [ Element.link [] { url = "/", label = text "counter" }
         , Element.link [] { url = "/stringreverser", label = text "String Reverser" }
+        , Element.link [] { url = "/sammich", label = text "Sammich" }
         ]

@@ -7,6 +7,7 @@ import Html exposing (Html)
 import Layout
 import Page.Counter as Counter
 import Page.NotFound as NotFound
+import Page.Sammich as Sammich
 import Page.StringReverser as StringReverser
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s)
@@ -45,6 +46,7 @@ init flags url key =
 
 type Page
     = NotFound
+    | Sammich Sammich.Model
     | Counter Counter.Model
     | StringReverser StringReverser.Model
 
@@ -65,6 +67,9 @@ view model =
         StringReverser subModel ->
             Layout.view StringReverserMsg (StringReverser.view subModel)
 
+        Sammich subModel ->
+            Layout.view SammichMsg (Sammich.view subModel)
+
 
 
 -- UPDATE
@@ -72,6 +77,7 @@ view model =
 
 type Msg
     = LinkClicked UrlRequest
+    | SammichMsg Sammich.Msg
     | UrlChanged Url
     | CounterMsg Counter.Msg
     | StringReverserMsg StringReverser.Msg
@@ -82,6 +88,7 @@ routeParser model =
     oneOf
         [ Parser.map (passToCounter model Counter.init) Parser.top
         , Parser.map (passToStringReverser model StringReverser.init) <| s "stringreverser"
+        , Parser.map (passToSammich model Sammich.init) <| s "sammich"
         ]
 
 
@@ -106,6 +113,13 @@ passToStringReverser : Model -> ( StringReverser.Model, Cmd StringReverser.Msg )
 passToStringReverser model ( stringReverserModel, stringReverserCmds ) =
     ( { model | page = StringReverser stringReverserModel }
     , Cmd.map StringReverserMsg stringReverserCmds
+    )
+
+
+passToSammich : Model -> ( Sammich.Model, Cmd Sammich.Msg ) -> ( Model, Cmd Msg )
+passToSammich model ( sammichModel, sammichCmds ) =
+    ( { model | page = Sammich sammichModel }
+    , Cmd.map SammichMsg sammichCmds
     )
 
 
@@ -135,6 +149,14 @@ update msg model =
             case model.page of
                 StringReverser stringReverser ->
                     passToStringReverser model (StringReverser.update subMsg stringReverser)
+
+                _ ->
+                    ( model, Cmd.none )
+
+        SammichMsg subMsg ->
+            case model.page of
+                Sammich sammich ->
+                    passToSammich model (Sammich.update subMsg sammich)
 
                 _ ->
                     ( model, Cmd.none )
