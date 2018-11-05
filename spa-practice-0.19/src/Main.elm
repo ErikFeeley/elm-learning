@@ -41,7 +41,7 @@ type alias Model =
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    mapToRoute url { key = key, page = NotFound }
+    toRoute url { key = key, page = NotFound }
 
 
 type Page
@@ -86,26 +86,35 @@ type Msg
 routeParser : Model -> Parser (( Model, Cmd Msg ) -> a) a
 routeParser model =
     oneOf
-        [ Parser.map (passToCounter model Counter.init) Parser.top
-        , Parser.map (passToStringReverser model StringReverser.init) <| s "stringreverser"
+        [ Parser.map (passToCounter2 model Counter.init) Parser.top
+
+        -- , Parser.map (passToStringReverser model StringReverser.init) <| s "stringreverser"
+        , Parser.map (StringReverser.init |> updateWith StringReverser StringReverserMsg model) <| s "stringreverser"
         , Parser.map (passToSammich model Sammich.init) <| s "sammich"
         ]
 
 
-mapToRoute : Url -> Model -> ( Model, Cmd Msg )
-mapToRoute url model =
-    case Parser.parse (routeParser model) url of
-        Just answer ->
-            answer
-
-        Nothing ->
-            ( { model | page = NotFound }, Cmd.none )
+toRoute : Url -> Model -> ( Model, Cmd Msg )
+toRoute url model =
+    Maybe.withDefault ( { model | page = NotFound }, Cmd.none ) <| Parser.parse (routeParser model) url
 
 
 passToCounter : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
 passToCounter model ( counterModel, counterCmds ) =
     ( { model | page = Counter counterModel }
     , Cmd.map CounterMsg counterCmds
+    )
+
+
+passToCounter2 : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
+passToCounter2 model ( counterModel, counterCmds ) =
+    updateWith Counter CounterMsg model ( counterModel, counterCmds )
+
+
+updateWith : (subModel -> Page) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
+updateWith toPage toMsg model ( subModel, subMsg ) =
+    ( { model | page = toPage subModel }
+    , Cmd.map toMsg subMsg
     )
 
 
@@ -135,28 +144,31 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            mapToRoute url model
+            toRoute url model
 
         CounterMsg subMsg ->
             case model.page of
-                Counter counter ->
-                    passToCounter model (Counter.update subMsg counter)
+                Counter subModel ->
+                    -- Counter.update subMsg subModel |> updateWith Counter CounterMsg model
+                    passToCounter2 model <| Counter.update subMsg subModel
 
                 _ ->
                     ( model, Cmd.none )
 
         StringReverserMsg subMsg ->
             case model.page of
-                StringReverser stringReverser ->
-                    passToStringReverser model (StringReverser.update subMsg stringReverser)
+                StringReverser subModel ->
+                    -- passToStringReverser model (StringReverser.update subMsg stringReverser)
+                    StringReverser.update subMsg subModel |> updateWith StringReverser StringReverserMsg model
 
                 _ ->
                     ( model, Cmd.none )
 
         SammichMsg subMsg ->
             case model.page of
-                Sammich sammich ->
-                    passToSammich model (Sammich.update subMsg sammich)
+                Sammich subModel ->
+                    -- passToSammich model (Sammich.update subMsg sammich)
+                    Sammich.update subMsg subModel |> updateWith Sammich SammichMsg model
 
                 _ ->
                     ( model, Cmd.none )
