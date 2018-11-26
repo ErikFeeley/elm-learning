@@ -28,6 +28,7 @@ viewNav =
     row [ Element.padding 2, Element.spacing 4 ]
         [ link [] { url = "/", label = text "counter" }
         , link [] { url = "/form", label = text "Form" }
+        , link [] { url = "/phttp", label = text "PHttp" }
         , link [] { url = "/stringreverser", label = text "String Reverser" }
         , link [] { url = "/sammich", label = text "Sammich" }
         ]

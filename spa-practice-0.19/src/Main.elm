@@ -7,6 +7,7 @@ import Html exposing (Html)
 import Layout
 import Page.Counter as Counter
 import Page.Form as Form
+import Page.Http as PHttp
 import Page.NotFound as NotFound
 import Page.Sammich as Sammich
 import Page.StringReverser as StringReverser
@@ -49,6 +50,7 @@ type Page
     = NotFound
     | Counter Counter.Model
     | Form Form.Model
+    | Http PHttp.Model
     | Sammich Sammich.Model
     | StringReverser StringReverser.Model
 
@@ -69,6 +71,9 @@ view model =
         Form subModel ->
             Layout.view FormMsg (Form.view subModel)
 
+        Http subModel ->
+            Layout.view HttpMsg (PHttp.view subModel)
+
         StringReverser subModel ->
             Layout.view StringReverserMsg (StringReverser.view subModel)
 
@@ -84,6 +89,7 @@ type Msg
     = LinkClicked UrlRequest
     | CounterMsg Counter.Msg
     | FormMsg Form.Msg
+    | HttpMsg PHttp.Msg
     | SammichMsg Sammich.Msg
     | StringReverserMsg StringReverser.Msg
     | UrlChanged Url
@@ -92,11 +98,10 @@ type Msg
 routeParser : Model -> Parser (( Model, Cmd Msg ) -> a) a
 routeParser model =
     oneOf
-        [ Parser.map (Counter.init |> (\x -> ( x, Cmd.none )) |> updateWith Counter CounterMsg model) Parser.top
-        , Parser.map (Form.init |> (\x -> ( x, Cmd.none )) |> updateWith Form FormMsg model) <| s "form"
-
-        -- , Parser.map (passToStringReverser model StringReverser.init) <| s "stringreverser"
-        , Parser.map (StringReverser.init |> updateWith StringReverser StringReverserMsg model) <| s "stringreverser"
+        [ Parser.map (Counter.init |> updateWithNoCmd Counter model) Parser.top
+        , Parser.map (Form.init |> updateWithNoCmd Form model) <| s "form"
+        , Parser.map (PHttp.init |> updateWith Http HttpMsg model) <| s "phttp"
+        , Parser.map (StringReverser.init |> updateWithNoCmd StringReverser model) <| s "stringreverser"
         , Parser.map (Sammich.init |> (\x -> ( x, Cmd.none )) |> updateWith Sammich SammichMsg model) <| s "sammich"
         ]
 
@@ -104,17 +109,6 @@ routeParser model =
 toRoute : Url -> Model -> ( Model, Cmd Msg )
 toRoute url model =
     Maybe.withDefault ( { model | page = NotFound }, Cmd.none ) <| Parser.parse (routeParser model) url
-
-
-
--- passToCounter : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
--- passToCounter model ( counterModel, counterCmds ) =
---     ( { model | page = Counter counterModel }
---     , Cmd.map CounterMsg counterCmds
---     )
--- passToCounter2 : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
--- passToCounter2 model ( counterModel, counterCmds ) =
---     updateWith Counter CounterMsg model ( counterModel, counterCmds )
 
 
 updateWith : (subModel -> Page) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
@@ -127,19 +121,6 @@ updateWith toPage toMsg model ( subModel, subMsg ) =
 updateWithNoCmd : (subModel -> Page) -> Model -> subModel -> ( Model, Cmd Msg )
 updateWithNoCmd toPage model subModel =
     ( { model | page = toPage subModel }, Cmd.none )
-
-
-
--- passToStringReverser : Model -> ( StringReverser.Model, Cmd StringReverser.Msg ) -> ( Model, Cmd Msg )
--- passToStringReverser model ( stringReverserModel, stringReverserCmds ) =
---     ( { model | page = StringReverser stringReverserModel }
---     , Cmd.map StringReverserMsg stringReverserCmds
---     )
--- passToSammich : Model -> Sammich.Model -> ( Model, Cmd Msg )
--- passToSammich model sammichModel =
---     ( { model | page = Sammich sammichModel }
---     , Cmd.none
---     )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -176,11 +157,20 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        HttpMsg subMsg ->
+            case model.page of
+                Http subModel ->
+                    PHttp.update subMsg subModel
+                        |> updateWith Http HttpMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
         StringReverserMsg subMsg ->
             case model.page of
                 StringReverser subModel ->
-                    -- passToStringReverser model (StringReverser.update subMsg stringReverser)
-                    StringReverser.update subMsg subModel |> updateWith StringReverser StringReverserMsg model
+                    StringReverser.update subMsg subModel
+                        |> updateWithNoCmd StringReverser model
 
                 _ ->
                     ( model, Cmd.none )
@@ -188,7 +178,6 @@ update msg model =
         SammichMsg subMsg ->
             case model.page of
                 Sammich subModel ->
-                    -- passToSammich model (Sammich.update subMsg sammich)
                     Sammich.update subMsg subModel
                         |> updateWithNoCmd Sammich model
 

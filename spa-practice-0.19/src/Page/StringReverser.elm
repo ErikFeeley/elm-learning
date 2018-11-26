@@ -14,13 +14,11 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    ( { theActualString = ""
-      , theReversedString = ""
-      }
-    , Cmd.none
-    )
+    { theActualString = ""
+    , theReversedString = ""
+    }
 
 
 
@@ -51,13 +49,11 @@ type Msg
     = Input String
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Input str ->
-            ( { model
+            { model
                 | theActualString = str
                 , theReversedString = String.reverse str
-              }
-            , Cmd.none
-            )
+            }
