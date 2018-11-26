@@ -12,9 +12,9 @@ type alias Model =
     { sammichs : Int }
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    ( { sammichs = 0 }, Cmd.none )
+    Model 1
 
 
 
@@ -41,8 +41,8 @@ type Msg
     = MakeSammich
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         MakeSammich ->
-            ( { model | sammichs = model.sammichs + 1 }, Cmd.none )
+            { model | sammichs = model.sammichs + 1 }

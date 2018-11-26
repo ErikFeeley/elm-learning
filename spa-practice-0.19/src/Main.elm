@@ -6,6 +6,7 @@ import Element
 import Html exposing (Html)
 import Layout
 import Page.Counter as Counter
+import Page.Form as Form
 import Page.NotFound as NotFound
 import Page.Sammich as Sammich
 import Page.StringReverser as StringReverser
@@ -46,8 +47,9 @@ init flags url key =
 
 type Page
     = NotFound
-    | Sammich Sammich.Model
     | Counter Counter.Model
+    | Form Form.Model
+    | Sammich Sammich.Model
     | StringReverser StringReverser.Model
 
 
@@ -64,6 +66,9 @@ view model =
         Counter subModel ->
             Layout.view CounterMsg (Counter.view subModel)
 
+        Form subModel ->
+            Layout.view FormMsg (Form.view subModel)
+
         StringReverser subModel ->
             Layout.view StringReverserMsg (StringReverser.view subModel)
 
@@ -77,16 +82,18 @@ view model =
 
 type Msg
     = LinkClicked UrlRequest
-    | SammichMsg Sammich.Msg
-    | UrlChanged Url
     | CounterMsg Counter.Msg
+    | FormMsg Form.Msg
+    | SammichMsg Sammich.Msg
     | StringReverserMsg StringReverser.Msg
+    | UrlChanged Url
 
 
 routeParser : Model -> Parser (( Model, Cmd Msg ) -> a) a
 routeParser model =
     oneOf
         [ Parser.map (passToCounter2 model Counter.init) Parser.top
+        , Parser.map (Form.init |> (\x -> ( x, Cmd.none )) |> updateWith Form FormMsg model) <| s "form"
 
         -- , Parser.map (passToStringReverser model StringReverser.init) <| s "stringreverser"
         , Parser.map (StringReverser.init |> updateWith StringReverser StringReverserMsg model) <| s "stringreverser"
@@ -125,10 +132,10 @@ passToStringReverser model ( stringReverserModel, stringReverserCmds ) =
     )
 
 
-passToSammich : Model -> ( Sammich.Model, Cmd Sammich.Msg ) -> ( Model, Cmd Msg )
-passToSammich model ( sammichModel, sammichCmds ) =
+passToSammich : Model -> Sammich.Model -> ( Model, Cmd Msg )
+passToSammich model sammichModel =
     ( { model | page = Sammich sammichModel }
-    , Cmd.map SammichMsg sammichCmds
+    , Cmd.none
     )
 
 
@@ -155,6 +162,16 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        FormMsg subMsg ->
+            case model.page of
+                Form subModel ->
+                    Form.update subMsg subModel
+                        |> (\x -> ( x, Cmd.none ))
+                        |> updateWith Form FormMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
         StringReverserMsg subMsg ->
             case model.page of
                 StringReverser subModel ->
@@ -168,7 +185,9 @@ update msg model =
             case model.page of
                 Sammich subModel ->
                     -- passToSammich model (Sammich.update subMsg sammich)
-                    Sammich.update subMsg subModel |> updateWith Sammich SammichMsg model
+                    Sammich.update subMsg subModel
+                        |> (\x -> ( x, Cmd.none ))
+                        |> updateWith Sammich SammichMsg model
 
                 _ ->
                     ( model, Cmd.none )
