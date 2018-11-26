@@ -12,9 +12,9 @@ type alias Model =
     { count : Int }
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    ( { count = 0 }, Cmd.none )
+    Model 0
 
 
 
@@ -45,14 +45,14 @@ type Msg
     | Reset
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Increment ->
-            ( { model | count = model.count + 1 }, Cmd.none )
+            { model | count = model.count + 1 }
 
         Decrement ->
-            ( { model | count = model.count - 1 }, Cmd.none )
+            { model | count = model.count - 1 }
 
         Reset ->
-            ( { model | count = 0 }, Cmd.none )
+            { model | count = 0 }

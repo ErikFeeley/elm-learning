@@ -92,12 +92,12 @@ type Msg
 routeParser : Model -> Parser (( Model, Cmd Msg ) -> a) a
 routeParser model =
     oneOf
-        [ Parser.map (passToCounter2 model Counter.init) Parser.top
+        [ Parser.map (Counter.init |> (\x -> ( x, Cmd.none )) |> updateWith Counter CounterMsg model) Parser.top
         , Parser.map (Form.init |> (\x -> ( x, Cmd.none )) |> updateWith Form FormMsg model) <| s "form"
 
         -- , Parser.map (passToStringReverser model StringReverser.init) <| s "stringreverser"
         , Parser.map (StringReverser.init |> updateWith StringReverser StringReverserMsg model) <| s "stringreverser"
-        , Parser.map (passToSammich model Sammich.init) <| s "sammich"
+        , Parser.map (Sammich.init |> (\x -> ( x, Cmd.none )) |> updateWith Sammich SammichMsg model) <| s "sammich"
         ]
 
 
@@ -106,16 +106,15 @@ toRoute url model =
     Maybe.withDefault ( { model | page = NotFound }, Cmd.none ) <| Parser.parse (routeParser model) url
 
 
-passToCounter : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
-passToCounter model ( counterModel, counterCmds ) =
-    ( { model | page = Counter counterModel }
-    , Cmd.map CounterMsg counterCmds
-    )
 
-
-passToCounter2 : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
-passToCounter2 model ( counterModel, counterCmds ) =
-    updateWith Counter CounterMsg model ( counterModel, counterCmds )
+-- passToCounter : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
+-- passToCounter model ( counterModel, counterCmds ) =
+--     ( { model | page = Counter counterModel }
+--     , Cmd.map CounterMsg counterCmds
+--     )
+-- passToCounter2 : Model -> ( Counter.Model, Cmd Counter.Msg ) -> ( Model, Cmd Msg )
+-- passToCounter2 model ( counterModel, counterCmds ) =
+--     updateWith Counter CounterMsg model ( counterModel, counterCmds )
 
 
 updateWith : (subModel -> Page) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
@@ -125,18 +124,22 @@ updateWith toPage toMsg model ( subModel, subMsg ) =
     )
 
 
-passToStringReverser : Model -> ( StringReverser.Model, Cmd StringReverser.Msg ) -> ( Model, Cmd Msg )
-passToStringReverser model ( stringReverserModel, stringReverserCmds ) =
-    ( { model | page = StringReverser stringReverserModel }
-    , Cmd.map StringReverserMsg stringReverserCmds
-    )
+updateWithNoCmd : (subModel -> Page) -> Model -> subModel -> ( Model, Cmd Msg )
+updateWithNoCmd toPage model subModel =
+    ( { model | page = toPage subModel }, Cmd.none )
 
 
-passToSammich : Model -> Sammich.Model -> ( Model, Cmd Msg )
-passToSammich model sammichModel =
-    ( { model | page = Sammich sammichModel }
-    , Cmd.none
-    )
+
+-- passToStringReverser : Model -> ( StringReverser.Model, Cmd StringReverser.Msg ) -> ( Model, Cmd Msg )
+-- passToStringReverser model ( stringReverserModel, stringReverserCmds ) =
+--     ( { model | page = StringReverser stringReverserModel }
+--     , Cmd.map StringReverserMsg stringReverserCmds
+--     )
+-- passToSammich : Model -> Sammich.Model -> ( Model, Cmd Msg )
+-- passToSammich model sammichModel =
+--     ( { model | page = Sammich sammichModel }
+--     , Cmd.none
+--     )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -156,8 +159,9 @@ update msg model =
         CounterMsg subMsg ->
             case model.page of
                 Counter subModel ->
-                    -- Counter.update subMsg subModel |> updateWith Counter CounterMsg model
-                    passToCounter2 model <| Counter.update subMsg subModel
+                    Counter.update subMsg subModel
+                        |> (\x -> ( x, Cmd.none ))
+                        |> updateWith Counter CounterMsg model
 
                 _ ->
                     ( model, Cmd.none )
@@ -186,8 +190,7 @@ update msg model =
                 Sammich subModel ->
                     -- passToSammich model (Sammich.update subMsg sammich)
                     Sammich.update subMsg subModel
-                        |> (\x -> ( x, Cmd.none ))
-                        |> updateWith Sammich SammichMsg model
+                        |> updateWithNoCmd Sammich model
 
                 _ ->
                     ( model, Cmd.none )
