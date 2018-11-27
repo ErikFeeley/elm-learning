@@ -11,6 +11,7 @@ import Page.Http as PHttp
 import Page.JsonDecoding as JsonDecoding
 import Page.NotFound as NotFound
 import Page.StringReverser as StringReverser
+import Page.Time as Time
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s)
 
@@ -53,6 +54,7 @@ type Page
     | Http PHttp.Model
     | JsonDecoding JsonDecoding.Model
     | StringReverser StringReverser.Model
+    | Time Time.Model
 
 
 
@@ -66,19 +68,22 @@ view model =
             Layout.view never NotFound.view
 
         Counter subModel ->
-            Layout.view CounterMsg (Counter.view subModel)
+            Layout.view GotCounterMsg (Counter.view subModel)
 
         Form subModel ->
-            Layout.view FormMsg (Form.view subModel)
+            Layout.view GotFormMsg (Form.view subModel)
 
         Http subModel ->
-            Layout.view HttpMsg (PHttp.view subModel)
+            Layout.view GotHttpMsg (PHttp.view subModel)
 
         JsonDecoding subModel ->
-            Layout.view JsonDecodingMsg (JsonDecoding.view subModel)
+            Layout.view GotJsonDecodingMsg (JsonDecoding.view subModel)
 
         StringReverser subModel ->
-            Layout.view StringReverserMsg (StringReverser.view subModel)
+            Layout.view GotStringReverserMsg (StringReverser.view subModel)
+
+        Time subModel ->
+            Layout.view GotTimeMsg (Time.view subModel)
 
 
 
@@ -87,11 +92,12 @@ view model =
 
 type Msg
     = LinkClicked UrlRequest
-    | CounterMsg Counter.Msg
-    | FormMsg Form.Msg
-    | HttpMsg PHttp.Msg
-    | JsonDecodingMsg JsonDecoding.Msg
-    | StringReverserMsg StringReverser.Msg
+    | GotCounterMsg Counter.Msg
+    | GotFormMsg Form.Msg
+    | GotHttpMsg PHttp.Msg
+    | GotJsonDecodingMsg JsonDecoding.Msg
+    | GotStringReverserMsg StringReverser.Msg
+    | GotTimeMsg Time.Msg
     | UrlChanged Url
 
 
@@ -100,9 +106,10 @@ routeParser model =
     oneOf
         [ Parser.map (Counter.init |> updateWithNoCmd Counter model) Parser.top
         , Parser.map (Form.init |> updateWithNoCmd Form model) <| s "form"
-        , Parser.map (PHttp.init |> updateWith Http HttpMsg model) <| s "phttp"
-        , Parser.map (JsonDecoding.init |> updateWith JsonDecoding JsonDecodingMsg model) <| s "jsondecoding"
+        , Parser.map (PHttp.init |> updateWith Http GotHttpMsg model) <| s "phttp"
+        , Parser.map (JsonDecoding.init |> updateWith JsonDecoding GotJsonDecodingMsg model) <| s "jsondecoding"
         , Parser.map (StringReverser.init |> updateWithNoCmd StringReverser model) <| s "stringreverser"
+        , Parser.map (Time.init |> updateWith Time GotTimeMsg model) <| s "time"
         ]
 
 
@@ -137,7 +144,7 @@ update msg model =
         UrlChanged url ->
             toRoute url model
 
-        CounterMsg subMsg ->
+        GotCounterMsg subMsg ->
             case model.page of
                 Counter subModel ->
                     Counter.update subMsg subModel
@@ -146,7 +153,7 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        FormMsg subMsg ->
+        GotFormMsg subMsg ->
             case model.page of
                 Form subModel ->
                     Form.update subMsg subModel
@@ -155,29 +162,38 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        HttpMsg subMsg ->
+        GotHttpMsg subMsg ->
             case model.page of
                 Http subModel ->
                     PHttp.update subMsg subModel
-                        |> updateWith Http HttpMsg model
+                        |> updateWith Http GotHttpMsg model
 
                 _ ->
                     ( model, Cmd.none )
 
-        JsonDecodingMsg subMsg ->
+        GotJsonDecodingMsg subMsg ->
             case model.page of
                 JsonDecoding subModel ->
                     JsonDecoding.update subMsg subModel
-                        |> updateWith JsonDecoding JsonDecodingMsg model
+                        |> updateWith JsonDecoding GotJsonDecodingMsg model
 
                 _ ->
                     ( model, Cmd.none )
 
-        StringReverserMsg subMsg ->
+        GotStringReverserMsg subMsg ->
             case model.page of
                 StringReverser subModel ->
                     StringReverser.update subMsg subModel
                         |> updateWithNoCmd StringReverser model
+
+                _ ->
+                    ( model, Cmd.none )
+
+        GotTimeMsg subMsg ->
+            case model.page of
+                Time subModel ->
+                    Time.update subMsg subModel
+                        |> updateWith Time GotTimeMsg model
 
                 _ ->
                     ( model, Cmd.none )
@@ -188,5 +204,10 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model.page of
+        Time time ->
+            Sub.map GotTimeMsg (Time.subscriptions time)
+
+        _ ->
+            Sub.none

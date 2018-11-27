@@ -31,4 +31,5 @@ viewNav =
         , link [] { url = "/phttp", label = text "PHttp" }
         , link [] { url = "/jsondecoding", label = text "Json Decoding" }
         , link [] { url = "/stringreverser", label = text "String Reverser" }
+        , link [] { url = "time", label = text "Time" }
         ]
