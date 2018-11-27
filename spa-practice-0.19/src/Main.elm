@@ -8,8 +8,8 @@ import Layout
 import Page.Counter as Counter
 import Page.Form as Form
 import Page.Http as PHttp
+import Page.JsonDecoding as JsonDecoding
 import Page.NotFound as NotFound
-import Page.Sammich as Sammich
 import Page.StringReverser as StringReverser
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s)
@@ -51,7 +51,7 @@ type Page
     | Counter Counter.Model
     | Form Form.Model
     | Http PHttp.Model
-    | Sammich Sammich.Model
+    | JsonDecoding JsonDecoding.Model
     | StringReverser StringReverser.Model
 
 
@@ -74,11 +74,11 @@ view model =
         Http subModel ->
             Layout.view HttpMsg (PHttp.view subModel)
 
+        JsonDecoding subModel ->
+            Layout.view JsonDecodingMsg (JsonDecoding.view subModel)
+
         StringReverser subModel ->
             Layout.view StringReverserMsg (StringReverser.view subModel)
-
-        Sammich subModel ->
-            Layout.view SammichMsg (Sammich.view subModel)
 
 
 
@@ -90,7 +90,7 @@ type Msg
     | CounterMsg Counter.Msg
     | FormMsg Form.Msg
     | HttpMsg PHttp.Msg
-    | SammichMsg Sammich.Msg
+    | JsonDecodingMsg JsonDecoding.Msg
     | StringReverserMsg StringReverser.Msg
     | UrlChanged Url
 
@@ -101,8 +101,8 @@ routeParser model =
         [ Parser.map (Counter.init |> updateWithNoCmd Counter model) Parser.top
         , Parser.map (Form.init |> updateWithNoCmd Form model) <| s "form"
         , Parser.map (PHttp.init |> updateWith Http HttpMsg model) <| s "phttp"
+        , Parser.map (JsonDecoding.init |> updateWith JsonDecoding JsonDecodingMsg model) <| s "jsondecoding"
         , Parser.map (StringReverser.init |> updateWithNoCmd StringReverser model) <| s "stringreverser"
-        , Parser.map (Sammich.init |> (\x -> ( x, Cmd.none )) |> updateWith Sammich SammichMsg model) <| s "sammich"
         ]
 
 
@@ -141,8 +141,7 @@ update msg model =
             case model.page of
                 Counter subModel ->
                     Counter.update subMsg subModel
-                        |> (\x -> ( x, Cmd.none ))
-                        |> updateWith Counter CounterMsg model
+                        |> updateWithNoCmd Counter model
 
                 _ ->
                     ( model, Cmd.none )
@@ -151,8 +150,7 @@ update msg model =
             case model.page of
                 Form subModel ->
                     Form.update subMsg subModel
-                        |> (\x -> ( x, Cmd.none ))
-                        |> updateWith Form FormMsg model
+                        |> updateWithNoCmd Form model
 
                 _ ->
                     ( model, Cmd.none )
@@ -166,20 +164,20 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        JsonDecodingMsg subMsg ->
+            case model.page of
+                JsonDecoding subModel ->
+                    JsonDecoding.update subMsg subModel
+                        |> updateWith JsonDecoding JsonDecodingMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
         StringReverserMsg subMsg ->
             case model.page of
                 StringReverser subModel ->
                     StringReverser.update subMsg subModel
                         |> updateWithNoCmd StringReverser model
-
-                _ ->
-                    ( model, Cmd.none )
-
-        SammichMsg subMsg ->
-            case model.page of
-                Sammich subModel ->
-                    Sammich.update subMsg subModel
-                        |> updateWithNoCmd Sammich model
 
                 _ ->
                     ( model, Cmd.none )
