@@ -4,6 +4,7 @@ import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation as Nav exposing (Key)
 import Element
 import Html exposing (Html)
+import Json.Decode as Decode exposing (Decoder)
 import Layout
 import Page.Counter as Counter
 import Page.Form as Form
@@ -20,7 +21,7 @@ import Url.Parser as Parser exposing ((</>), Parser, oneOf, s)
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program Decode.Value Model Msg
 main =
     application
         { init = init
@@ -39,12 +40,22 @@ main =
 type alias Model =
     { page : Page
     , key : Key
+    , flags : Flags
     }
 
 
-init : () -> Url -> Key -> ( Model, Cmd Msg )
+type alias Flags =
+    { herp : String }
+
+
+flagsDecoder : Decoder Flags
+flagsDecoder =
+    Decode.map Flags (Decode.field "herp" Decode.string)
+
+
+init : Decode.Value -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    toRoute url { key = key, page = NotFound }
+    toRoute url { flags = Decode.decodeValue flagsDecoder flags |> Result.withDefault (Flags "something broke"), key = key, page = NotFound }
 
 
 type Page
