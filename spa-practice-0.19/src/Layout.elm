@@ -30,6 +30,7 @@ viewNav =
         , link [] { url = "/form", label = text "Form" }
         , link [] { url = "/phttp", label = text "PHttp" }
         , link [] { url = "/jsondecoding", label = text "Json Decoding" }
+        , link [] { url = "/localstorage", label = text "Local Storage" }
         , link [] { url = "/stringreverser", label = text "String Reverser" }
         , link [] { url = "time", label = text "Time" }
         ]

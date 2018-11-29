@@ -68,6 +68,8 @@ update msg model =
 -- SUBSCRIPTIONS
 
 
+{-| there may be a bug with time subscriptions see core issue 980
+-}
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Time.every 1000 Tick

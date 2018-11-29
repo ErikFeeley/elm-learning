@@ -10,6 +10,7 @@ import Page.Counter as Counter
 import Page.Form as Form
 import Page.Http as PHttp
 import Page.JsonDecoding as JsonDecoding
+import Page.LocalStorage as LocalStorage
 import Page.NotFound as NotFound
 import Page.StringReverser as StringReverser
 import Page.Time as Time
@@ -55,7 +56,13 @@ flagsDecoder =
 
 init : Decode.Value -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    toRoute url { flags = Decode.decodeValue flagsDecoder flags |> Result.withDefault (Flags "something broke"), key = key, page = NotFound }
+    toRoute url
+        { flags =
+            Decode.decodeValue flagsDecoder flags
+                |> Result.withDefault (Flags "something broke")
+        , key = key
+        , page = NotFound
+        }
 
 
 type Page
@@ -64,6 +71,7 @@ type Page
     | Form Form.Model
     | Http PHttp.Model
     | JsonDecoding JsonDecoding.Model
+    | LocalStorage LocalStorage.Model
     | StringReverser StringReverser.Model
     | Time Time.Model
 
@@ -90,6 +98,9 @@ view model =
         JsonDecoding subModel ->
             Layout.view GotJsonDecodingMsg (JsonDecoding.view subModel)
 
+        LocalStorage subModel ->
+            Layout.view GotLocalStorageMsg (LocalStorage.view subModel)
+
         StringReverser subModel ->
             Layout.view GotStringReverserMsg (StringReverser.view subModel)
 
@@ -107,6 +118,7 @@ type Msg
     | GotFormMsg Form.Msg
     | GotHttpMsg PHttp.Msg
     | GotJsonDecodingMsg JsonDecoding.Msg
+    | GotLocalStorageMsg LocalStorage.Msg
     | GotStringReverserMsg StringReverser.Msg
     | GotTimeMsg Time.Msg
     | UrlChanged Url
@@ -119,6 +131,7 @@ routeParser model =
         , Parser.map (Form.init |> updateWithNoCmd Form model) <| s "form"
         , Parser.map (PHttp.init |> updateWith Http GotHttpMsg model) <| s "phttp"
         , Parser.map (JsonDecoding.init |> updateWith JsonDecoding GotJsonDecodingMsg model) <| s "jsondecoding"
+        , Parser.map (LocalStorage.init |> updateWith LocalStorage GotLocalStorageMsg model) <| s "localstorage"
         , Parser.map (StringReverser.init |> updateWithNoCmd StringReverser model) <| s "stringreverser"
         , Parser.map (Time.init |> updateWith Time GotTimeMsg model) <| s "time"
         ]
@@ -191,6 +204,15 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        GotLocalStorageMsg subMsg ->
+            case model.page of
+                LocalStorage subModel ->
+                    LocalStorage.update subMsg subModel
+                        |> updateWith LocalStorage GotLocalStorageMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
         GotStringReverserMsg subMsg ->
             case model.page of
                 StringReverser subModel ->
@@ -217,6 +239,9 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.page of
+        LocalStorage localStorage ->
+            Sub.map GotLocalStorageMsg (LocalStorage.subscriptions localStorage)
+
         Time time ->
             Sub.map GotTimeMsg (Time.subscriptions time)
 
