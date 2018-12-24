@@ -1,0 +1,16 @@
+{
+  "name": "spa-practice-0.19",
+  "version": "1.0.0",
+  "description": "",
+  "main": "elm.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "elm-format": "^0.8.1",
+    "elm-live": "^3.4.0"
+  }
+}

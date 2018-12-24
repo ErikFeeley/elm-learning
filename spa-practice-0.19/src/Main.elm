@@ -51,7 +51,8 @@ type alias Flags =
 
 flagsDecoder : Decoder Flags
 flagsDecoder =
-    Decode.map Flags (Decode.field "herp" Decode.string)
+    Decode.field "herp" Decode.string
+        |> Decode.map Flags
 
 
 init : Decode.Value -> Url -> Key -> ( Model, Cmd Msg )
@@ -139,7 +140,8 @@ routeParser model =
 
 toRoute : Url -> Model -> ( Model, Cmd Msg )
 toRoute url model =
-    Maybe.withDefault ( { model | page = NotFound }, Cmd.none ) <| Parser.parse (routeParser model) url
+    Parser.parse (routeParser model) url
+        |> Maybe.withDefault ( { model | page = NotFound }, Cmd.none )
 
 
 updateWith : (subModel -> Page) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
