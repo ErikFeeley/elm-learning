@@ -62,12 +62,13 @@ init flags url key =
             Decode.decodeValue flagsDecoder flags
                 |> Result.withDefault (Flags "something broke")
         , key = key
-        , page = NotFound
+        , page = Blank
         }
 
 
 type Page
     = NotFound
+    | Blank
     | Counter Counter.Model
     | Form Form.Model
     | Http PHttp.Model
@@ -86,6 +87,9 @@ view model =
     case model.page of
         NotFound ->
             Layout.view never NotFound.view
+
+        Blank ->
+            Layout.view never Element.none
 
         Counter subModel ->
             Layout.view GotCounterMsg (Counter.view subModel)
