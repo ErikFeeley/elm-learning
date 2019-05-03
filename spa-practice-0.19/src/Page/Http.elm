@@ -1,7 +1,10 @@
 module Page.Http exposing (Model, Msg, init, update, view)
 
+import ApplicationUser exposing (ApplicationUser, isAuthenticated)
+import Browser.Navigation exposing (load)
 import Element exposing (Element, column, el, row, text)
 import Http
+import Url.Builder exposing (relative)
 
 
 
@@ -10,18 +13,23 @@ import Http
 
 type Model
     = Failure
+    | NotAllowed
     | Loading
     | Success String
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( Loading
-    , Http.get
-        { url = "https://elm-lang.org/assets/public-opinion.txt"
-        , expect = Http.expectString GotText
-        }
-    )
+init : ApplicationUser -> ( Model, Cmd Msg )
+init applicationUser =
+    if isAuthenticated applicationUser then
+        ( Loading
+        , Http.get
+            { url = "https://elm-lang.org/assets/public-opinion.txt"
+            , expect = Http.expectString GotText
+            }
+        )
+
+    else
+        ( NotAllowed, relative [ "form" ] [] |> load )
 
 
 
@@ -33,6 +41,9 @@ view model =
     case model of
         Failure ->
             text "unable to load text"
+
+        NotAllowed ->
+            text "you cant put that there!"
 
         Loading ->
             text "loading text"

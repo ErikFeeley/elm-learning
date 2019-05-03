@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import ApplicationUser exposing (ApplicationUser, anon)
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation as Nav exposing (Key)
 import Element
@@ -42,6 +43,7 @@ type alias Model =
     { page : Page
     , key : Key
     , flags : Flags
+    , applicationUser : ApplicationUser
     }
 
 
@@ -63,6 +65,7 @@ init flags url key =
                 |> Result.withDefault (Flags "something broke")
         , key = key
         , page = Blank
+        , applicationUser = anon
         }
 
 
@@ -134,7 +137,7 @@ routeParser model =
     oneOf
         [ Parser.map (Counter.init |> updateWithNoCmd Counter model) Parser.top
         , Parser.map (Form.init |> updateWithNoCmd Form model) <| s "form"
-        , Parser.map (PHttp.init |> updateWith Http GotHttpMsg model) <| s "phttp"
+        , Parser.map (PHttp.init model.applicationUser |> updateWith Http GotHttpMsg model) <| s "phttp"
         , Parser.map (JsonDecoding.init |> updateWith JsonDecoding GotJsonDecodingMsg model) <| s "jsondecoding"
         , Parser.map (LocalStorage.init |> updateWith LocalStorage GotLocalStorageMsg model) <| s "localstorage"
         , Parser.map (StringReverser.init |> updateWithNoCmd StringReverser model) <| s "stringreverser"
