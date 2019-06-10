@@ -4,7 +4,6 @@ import ApplicationUser exposing (ApplicationUser, anon)
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation as Nav exposing (Key)
 import Element
-import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Layout
 import Page.Counter as Counter
@@ -16,7 +15,7 @@ import Page.NotFound as NotFound
 import Page.StringReverser as StringReverser
 import Page.Time as Time
 import Url exposing (Url)
-import Url.Parser as Parser exposing ((</>), Parser, oneOf, s)
+import Url.Parser as Parser exposing (Parser, oneOf, s)
 
 
 

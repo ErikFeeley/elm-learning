@@ -2,7 +2,7 @@ module Page.Http exposing (Model, Msg, init, update, view)
 
 import ApplicationUser exposing (ApplicationUser, isAuthenticated)
 import Browser.Navigation exposing (load)
-import Element exposing (Element, column, el, row, text)
+import Element exposing (Element, text)
 import Http
 import Url.Builder exposing (relative)
 
@@ -61,7 +61,7 @@ type Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg _ =
     case msg of
         GotText result ->
             case result of
