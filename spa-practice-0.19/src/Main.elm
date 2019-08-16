@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import ApplicationUser exposing (ApplicationUser, anon)
+import ApplicationUser exposing (ApplicationUser, anon, authenticated)
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation as Nav exposing (Key)
 import Element
@@ -64,7 +64,7 @@ init flags url key =
                 |> Result.withDefault (Flags "something broke")
         , key = key
         , page = Blank
-        , applicationUser = anon
+        , applicationUser = authenticated "wat"
         }
 
 
