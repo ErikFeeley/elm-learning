@@ -16,7 +16,9 @@ type alias Model =
 
 
 type alias Validation =
-    { condition : Bool, errorMessage : String }
+    { condition : Bool
+    , errorMessage : String
+    }
 
 
 validatePassword : String -> String -> List String
